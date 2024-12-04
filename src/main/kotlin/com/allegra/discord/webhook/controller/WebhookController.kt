@@ -11,11 +11,16 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.http.client.MultipartBodyBuilder
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.netty.http.client.HttpClient
+import reactor.netty.resources.ConnectionProvider
+import java.time.Duration
+
 
 private val logger = KotlinLogging.logger {}
 
@@ -30,7 +35,16 @@ class WebhookController {
         logger.info { "received a new message from jellyfin webhooks plugin" }
         logger.debug { body }
 
-        val webClient = WebClient.create()
+        val provider = ConnectionProvider.builder("fixed")
+            .maxConnections(500)
+            .maxIdleTime(Duration.ofSeconds(20))
+            .maxLifeTime(Duration.ofSeconds(60))
+            .pendingAcquireTimeout(Duration.ofSeconds(60))
+            .evictInBackground(Duration.ofSeconds(120)).build()
+
+        val webClient = WebClient.builder()
+            .clientConnector(ReactorClientHttpConnector(HttpClient.create(provider)))
+            .build()
 
         // get the image referenced in the thumbnail
         logger.info { "getting thumbnail from jellyfin" }
