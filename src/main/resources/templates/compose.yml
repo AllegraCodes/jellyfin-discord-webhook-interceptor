@@ -1,0 +1,28 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:10.10
+    container_name: jellyfin
+    group_add:
+      - "44" # video
+      - "107" # render
+    ports:
+      - 8096:8096
+    volumes:
+      - /mnt/tank/docker/jellyfin/config:/config
+      - /mnt/tank/docker/jellyfin/cache:/cache
+      - /mnt/tank/media:/media
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    restart: unless-stopped
+    networks:
+      - jellyfin_network
+  interceptor:
+    image: username/repo:0.0.2
+    container_name: interceptor
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    networks:
+      - jellyfin_network
+networks:
+  jellyfin_network: {}

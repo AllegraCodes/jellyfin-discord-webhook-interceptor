@@ -3,12 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "3.2.5"
 	id("io.spring.dependency-management") version "1.1.4"
+	id("com.bmuschko.docker-java-application") version "9.4.0"
 	kotlin("jvm") version "1.9.23"
 	kotlin("plugin.spring") version "1.9.23"
 }
 
 group = "com.allegra"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.2"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
@@ -37,4 +38,16 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+docker {
+	javaApplication {
+		images.set(listOf("username/repo:$version"))
+		baseImage.set("amazoncorretto:21")
+	}
+
+	registryCredentials {
+		username.set("username")
+		password.set("password")
+	}
 }
