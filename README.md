@@ -8,4 +8,5 @@ Docker Instructions:
 1. Follow instructions above, using the container name in step 3
 2. Provide your docker hub username and password in build.gradle.kts
 3. Set the image name
-4. See compose.yml for an example of use
+4. Run the gradle task dockerPushImage
+5. See compose.yml for an example of use
